@@ -12,7 +12,15 @@ except ImportError:
 
 
 def _resize_cv2(img, size, interpolation):
-    img = img.transpose((1, 2, 0))
+    if img.ndim == 2:
+        # If input is a grayscale image, cv2 returns a two-dimentional array.
+        img = img[:, :, np.newaxis]
+    elif img.ndim == 3:
+        img = img.transpose((1, 2, 0))
+    else:
+        raise ValueError('Number of image dimensions must be 2 or 3: ndim {}'
+                         .format(img.ndim))
+
     if interpolation == PIL.Image.NEAREST:
         cv_interpolation = cv2.INTER_NEAREST
     elif interpolation == PIL.Image.BILINEAR:
@@ -24,13 +32,17 @@ def _resize_cv2(img, size, interpolation):
     H, W = size
     img = cv2.resize(img, dsize=(W, H), interpolation=cv_interpolation)
 
-    # If input is a grayscale image, cv2 returns a two-dimentional array.
-    if len(img.shape) == 2:
-        img = img[:, :, np.newaxis]
     return img.transpose((2, 0, 1))
 
 
 def _resize_pil(img, size, interpolation):
+    if img.ndim == 2:
+        img = img[np.newaxis, :, :]
+    elif img.ndim == 3:
+        pass
+    else:
+        raise ValueError('Number of image dimensions must be 2 or 3: ndim {}'
+                         .format(img.ndim))
     C = img.shape[0]
     H, W = size
     out = np.empty((C, H, W), dtype=img.dtype)
