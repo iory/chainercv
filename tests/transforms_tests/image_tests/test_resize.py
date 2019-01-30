@@ -27,5 +27,9 @@ class TestResize(unittest.TestCase):
         out = resize(img, size=(32, 64), interpolation=self.interpolation)
         self.assertEqual(out.shape, (1, 32, 64))
 
+        img = np.random.uniform(size=(24, 32))
+        out = resize(img, size=(32, 64), interpolation=self.interpolation)
+        self.assertEqual(out.shape, (1, 32, 64))
+
 
 testing.run_module(__name__, __file__)
